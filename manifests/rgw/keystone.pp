@@ -34,7 +34,7 @@
 #   Optional. Default is 'v2.0'
 #
 # [*rgw_keystone_accepted_roles*] Roles to accept from keystone.
-#   Optional. Default is '_member_, Member'.
+#   Optional. Default is 'Member'.
 #   Comma separated list of roles.
 #
 # [*rgw_keystone_token_cache_size*] How many tokens to keep cached.
@@ -71,12 +71,16 @@
 #
 # [*rgw_keystone_admin_password*] The password for OpenStack admin user
 #   Required if rgw_keystone_version is 'v3'.
+#
+# [*rgw_keystone_implicit_tenants*] Set 'true' for a private tenant
+#   for each user.
+#   Defaults is true
 
 define ceph::rgw::keystone (
   $rgw_keystone_admin_token         = undef,
   $rgw_keystone_url                 = 'http://127.0.0.1:5000',
   $rgw_keystone_version             = 'v2.0',
-  $rgw_keystone_accepted_roles      = '_member_, Member',
+  $rgw_keystone_accepted_roles      = 'Member',
   $rgw_keystone_token_cache_size    = 500,
   $rgw_s3_auth_use_keystone         = true,
   $use_pki                          = true,
@@ -87,6 +91,7 @@ define ceph::rgw::keystone (
   $rgw_keystone_admin_project       = $::ceph::profile::params::rgw_keystone_admin_project,
   $rgw_keystone_admin_user          = $::ceph::profile::params::rgw_keystone_admin_user,
   $rgw_keystone_admin_password      = $::ceph::profile::params::rgw_keystone_admin_password,
+  $rgw_keystone_implicit_tenants    = true,
 ) {
 
   unless $name =~ /^radosgw\..+/ {
@@ -98,6 +103,7 @@ define ceph::rgw::keystone (
     "client.${name}/rgw_keystone_accepted_roles":      value => join(any2array($rgw_keystone_accepted_roles), ',');
     "client.${name}/rgw_keystone_token_cache_size":    value => $rgw_keystone_token_cache_size;
     "client.${name}/rgw_s3_auth_use_keystone":         value => $rgw_s3_auth_use_keystone;
+    "client.${name}/rgw_keystone_implicit_tenants":    value => $rgw_keystone_implicit_tenants;
   }
 
   if $rgw_keystone_version == 'v2.0' {
